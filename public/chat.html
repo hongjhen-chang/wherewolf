@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Chat Room</title>
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
+<style>
+body { margin:40px; }
+#chatBox { border:1px solid #ccc; padding:10px; height:400px; overflow-y:auto; background:#f9f9f9; }
+#chatBox li { margin-bottom:5px; }
+#chatHeader { font-weight:bold; margin-bottom:10px; }
+</style>
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+<h3>聊天室</h3>
+<a href="/api/logout">Logout</a>
+
+<hr>
+<p id="userlist"></p>
+
+<button onclick="start()">開始遊戲</button>
+
+<div id="chatBox">
+  <ul id="messages"></ul>
+</div>
+
+<input id="msg" placeholder="輸入訊息">
+<button onclick="send()">送出</button>
+
+<script>
+const socket = io();
+
+socket.on("chatMessage", (data)=>{
+  const li=document.createElement("li");
+  li.innerHTML = `<strong>${data.user}</strong>: ${data.text}`;
+  document.getElementById("messages").appendChild(li);
+  document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+});
+
+// 發送訊息
+function send(){
+  const text = document.getElementById("msg").value;
+  if(text.trim()==="") return;
+  socket.emit("chatMessage", text);
+  document.getElementById("msg").value="";
+}
+
+function start(){
+  socket.emit("gameStart");
+  fetch("/api/users").then(res => {
+    return res.json();
+  }).then(result => {
+    document.getElementById("userlist").innerText=result;
+  });
+}
+</script>
+
+</body>
+</html>

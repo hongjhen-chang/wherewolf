@@ -20,7 +20,65 @@ CREATE TABLE IF NOT EXISTS users(
 )
 `);
 
-var game
+const state_idle = 0;
+const state_role = 1;
+const state_sunset = 2;
+const state_wolfup = 3;
+const state_wolfkill = 4;
+const state_wolfdown = 5;
+const state_witchup = 6;
+const state_witchrescue = 7;
+const state_witchpoison = 8;
+const state_witchdown = 9;
+const state_sunrise = 10;
+
+let game_state = idle;
+
+let stat_string = [];
+stat_string[state_idle] = "準備中";
+stat_string[state_role] = "確認角色身分";
+stat_string[state_sunset] = "天黑請閉眼";
+stat_string[state_wolfup] = "狼人請睜眼";
+stat_string[state_wolfkill] = "狼人請殺人";
+stat_string[state_wolfdown] = "狼人請閉眼";
+stat_string[state_witchup] = "女巫請睜眼";
+stat_string[state_witchrescue] = "他被殺死了，你要救他嗎";
+stat_string[state_witchpoison] = "你要使用毒藥嗎";
+stat_string[state_witchdown] = "女巫請閉眼";
+stat_string[state_sunrise] = "天亮請睜眼";
+
+const role_wolf = 0;
+const role_witch = 1;
+const role_civilian = 2;
+
+let role_string = [];
+role_string[role_wolf] = "狼人";
+role_string[role_witch] = "女巫";
+role_string[role_civilian] = "平民";
+
+function game_process(user)
+{
+    switch (game_state) {
+        case state_idle: 
+        break;
+        case state_role: 
+        break;
+        case state_sunset: 
+        break;
+        case state_wolfup: 
+        break;
+        case state_wolfkill: 
+        break;
+        case state_wolfdown: 
+        break;
+        case state_witchup: 
+        break;
+        case state_witchrescue: 
+        break;
+        case state_witchpoison: 
+        break;
+    }
+}
 
 // ----- Middleware -----
 app.use(express.json());
@@ -107,7 +165,7 @@ io.on("connection", (socket)=>{
   const username = sess.user.username;
   console.log(username + " connected");
 
-  loginUsers[username] = { user: sess.user };
+  loginUsers[username] = { user: sess.user, socket: socket };
   socket.broadcast.emit("chatMessage", { user:"System", text:`${username} 加入聊天室` });
 
   socket.on("chatMessage", msg=>{
@@ -115,11 +173,12 @@ io.on("connection", (socket)=>{
   });
 
   socket.on("gameStart", function() {
+    gstateMachine
     io.emit("chatMessage", { user:username, text:"Game Start" });
   });
 
   socket.on("disconnect", ()=>{
-	delete loginUsers[username];
+    delete loginUsers[username];
     io.emit("chatMessage", { user:"System", text:`${username} 離開聊天室` });
   });
 });
